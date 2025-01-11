@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Daftar Mahasiswa</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+
+        table, th, td {
+            border: 1px solid #ddd;
+        }
+
+        th, td {
+            padding: 8px 12px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #f4f4f4;
+        }
+
+        .pagination {
+            display: inline-block;
+        }
+
+        .pagination a {
+            padding: 8px 16px;
+            margin: 4px;
+            border: 1px solid #ddd;
+            text-decoration: none;
+            color: #000;
+        }
+
+        .pagination a.active {
+            background-color: #4CAF50;
+            color: white;
+        }
+
+        .pagination a:hover {
+            background-color: #ddd;
+        }
+    </style>
+</head>
+<body>
+
+<h2>Daftar Mahasiswa</h2>
+
+<table id="studentTable">
+    <thead>
+        <tr>
+            <th>NIM</th>
+            <th>Nama</th>
+            <th>Alamat</th>
+        </tr>
+    </thead>
+    <tbody>
+        <!-- Data Mahasiswa akan diisi di sini -->
+    </tbody>
+</table>
+
+<div class="pagination" id="pagination">
+    <!-- Pagination buttons will appear here -->
+</div>
+
+<script>
+    const rowsPerPage = 4;
+    let currentPage = 1;
+    let students = [];
+
+    // Fungsi untuk mengambil data mahasiswa dari server (PHP)
+    async function fetchData() {
+        try {
+            const response = await fetch('data.php');
+            const data = await response.json();
+            students = data;
+            displayTable();
+        } catch (error) {
+            console.error('Error fetching data:', error);
+        }
+    }
+
+    // Fungsi untuk menampilkan data pada tabel
+    function displayTable() {
+        const startIndex = (currentPage - 1) * rowsPerPage;
+        const endIndex = startIndex + rowsPerPage;
+        const currentData = students.slice(startIndex, endIndex);
+
+        const tableBody = document.querySelector('#studentTable tbody');
+        tableBody.innerHTML = '';
+
+        currentData.forEach(student => {
+            const row = document.createElement('tr');
+            row.innerHTML = `<td>${student.nim}</td><td>${student.nama}</td><td>${student.alamat}</td>`;
+            tableBody.appendChild(row);
+        });
+
+        updatePagination();
+    }
+
+    // Fungsi untuk memperbarui tombol pagination
+    function updatePagination() {
+        const pageCount = Math.ceil(students.length / rowsPerPage);
+        const paginationDiv = document.getElementById('pagination');
+        paginationDiv.innerHTML = '';
+
+        for (let i = 1; i <= pageCount; i++) {
+            const pageLink = document.createElement('a');
+            pageLink.href = '#';
+            pageLink.textContent = i;
+            pageLink.classList.add(i === currentPage ? 'active' : '');
+            pageLink.onclick = (e) => {
+                e.preventDefault();
+                currentPage = i;
+                displayTable();
+            };
+            paginationDiv.appendChild(pageLink);
+        }
+    }
+
+    // Memanggil fetchData saat halaman dimuat
+    fetchData();
+</script>
+
+</body>
+</html>

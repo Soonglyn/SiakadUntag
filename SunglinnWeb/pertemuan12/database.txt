@@ -1,0 +1,5 @@
+CREATE TABLE mahasiswa (
+    nim VARCHAR(10) PRIMARY KEY,
+    nama VARCHAR(100),
+    alamat TEXT
+);
